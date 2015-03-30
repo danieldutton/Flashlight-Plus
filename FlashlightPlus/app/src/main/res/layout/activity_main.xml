@@ -12,6 +12,6 @@
         android:name="uk.co.dannybdutton.flashlightplus.fragments.TorchFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_torch" />
 
 </LinearLayout>
