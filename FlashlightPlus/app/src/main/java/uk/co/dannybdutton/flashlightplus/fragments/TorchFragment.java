@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import uk.co.dannybdutton.flashlightplus.R;
@@ -43,7 +44,7 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_torch, container, false);
 
-        Button button = (Button) rootView.findViewById(R.id.buttonFlashOn);
+        ImageButton button = (ImageButton) rootView.findViewById(R.id.buttonFlashOn);
         button.setOnClickListener(this);
 
         return rootView;
@@ -107,6 +108,50 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         alert.show();
     }
 
+    private void turnOnFlash() {
+        if (!flashIsOn) {
+            if (camera == null || parameters == null) {
+                adviseErrorInitialisingFlash();
+                return;
+            }
+            playClickSound();
+
+            parameters = camera.getParameters();
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(parameters);
+            camera.startPreview();
+            flashIsOn = true;
+        }
+
+    }
+
+    private void turnOffFlash() {
+        if (flashIsOn) {
+            if (camera == null || parameters == null) {
+                adviseErrorInitialisingFlash();
+                return;
+            }
+            playClickSound();
+
+            parameters = camera.getParameters();
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(parameters);
+            camera.stopPreview();
+            flashIsOn = false;
+        }
+    }
+
+    private void getCamera() {
+        if (camera == null) {
+            try {
+                camera = Camera.open();
+                parameters = camera.getParameters();
+            } catch (RuntimeException e) {
+                adviseErrorInitialisingFlash();
+            }
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -152,47 +197,4 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
                 .show();
     }
 
-    private void turnOnFlash() {
-        if (!flashIsOn) {
-            if (camera == null || parameters == null) {
-                adviseErrorInitialisingFlash();
-                return;
-            }
-            playClickSound();
-
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            camera.setParameters(parameters);
-            camera.startPreview();
-            flashIsOn = true;
-        }
-
-    }
-
-    private void turnOffFlash() {
-        if (flashIsOn) {
-            if (camera == null || parameters == null) {
-                adviseErrorInitialisingFlash();
-                return;
-            }
-            playClickSound();
-
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-            camera.setParameters(parameters);
-            camera.stopPreview();
-            flashIsOn = false;
-        }
-    }
-
-    private void getCamera() {
-        if (camera == null) {
-            try {
-                camera = Camera.open();
-                parameters = camera.getParameters();
-            } catch (RuntimeException e) {
-                adviseErrorInitialisingFlash();
-            }
-        }
-    }
 }
