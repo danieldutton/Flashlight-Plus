@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -22,6 +23,8 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
     private boolean flashIsOn = false;
 
+    private MediaPlayer mediaPlayer;
+
     public TorchFragment() {
     }
 
@@ -33,6 +36,11 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
             adviseNoFlashDeviceAvailable();
     }
 
+    private boolean DeviceHasNoFlash() {
+        return !getActivity().getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+    }
+
     private void adviseNoFlashDeviceAvailable() {
         AlertDialog alert = new AlertDialog.Builder(getActivity())
                 .create();
@@ -42,7 +50,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         alert.setButton("OK", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
-                // closing the application
                 getActivity().finish();
             }
         });
@@ -50,8 +57,18 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     }
 
     private void adviseErrorInitialisingFlash() {
-        Toast.makeText(getActivity(), "Error Initialising Camera", Toast.LENGTH_LONG)
-                .show();
+        AlertDialog alert = new AlertDialog.Builder(getActivity())
+                .create();
+
+        alert.setTitle("Error");
+        alert.setMessage("Error initialising camera!");
+        alert.setButton("OK", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                getActivity().finish();
+            }
+        });
+        alert.show();
     }
 
     private void displayFlash() {
@@ -105,31 +122,35 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
                 .show();
     }
 
-    private boolean DeviceHasNoFlash() {
-        return !getActivity().getPackageManager()
-                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-    }
-
     @Override
     public void onClick(View v) {
-        myButtonClickHandler(v);
-    }
-
-    public void myButtonClickHandler(View view) {
-
         //Activity theActivity = getActivity();
         //TorchSettingsCoordinator tsc = (TorchSettingsCoordinator) theActivity;
         //tsc.onSelectedSettingChanged();
         if (flashIsOn) {
             flashIsOn = false;
             camera.release();
+            playClickSound();
         } else {
             flashIsOn = true;
+            playClickSound();
             camera = camera.open();
             displayFlash();
         }
 
         Toast.makeText(getActivity(), "Button Working", Toast.LENGTH_LONG)
                 .show();
+    }
+
+    private void playClickSound(){
+        mediaPlayer = MediaPlayer.create(getActivity(), R.raw.button_click);
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.release();
+            }
+        });
+        mediaPlayer.release();
     }
 }
