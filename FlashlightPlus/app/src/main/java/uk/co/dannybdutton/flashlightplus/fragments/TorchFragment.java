@@ -1,6 +1,9 @@
 package uk.co.dannybdutton.flashlightplus.fragments;
 
 
+import android.app.AlertDialog;
+import android.app.Application;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -17,7 +20,7 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
     private Camera camera;
 
-    private boolean toggledOn = false;
+    private boolean flashIsOn = false;
 
     public TorchFragment() {
     }
@@ -31,8 +34,19 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     }
 
     private void adviseNoFlashDeviceAvailable() {
-        Toast.makeText(getActivity(), "No Flash is available on your device", Toast.LENGTH_LONG)
-                .show();
+        AlertDialog alert = new AlertDialog.Builder(getActivity())
+                .create();
+
+        alert.setTitle("Error");
+        alert.setMessage("Sorry, your device doesn't support flash light!");
+        alert.setButton("OK", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // closing the application
+                getActivity().finish();
+            }
+        });
+        alert.show();
     }
 
     private void adviseErrorInitialisingFlash() {
@@ -41,8 +55,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     }
 
     private void displayFlash() {
-
-        camera = Camera.open();
 
         if (camera == null)
             adviseErrorInitialisingFlash();
@@ -61,6 +73,12 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         button.setOnClickListener(this);
 
         return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        camera.release();
     }
 
     @Override
@@ -102,11 +120,12 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         //Activity theActivity = getActivity();
         //TorchSettingsCoordinator tsc = (TorchSettingsCoordinator) theActivity;
         //tsc.onSelectedSettingChanged();
-        if (toggledOn) {
-            toggledOn = false;
+        if (flashIsOn) {
+            flashIsOn = false;
             camera.release();
         } else {
-            toggledOn = true;
+            flashIsOn = true;
+            camera = camera.open();
             displayFlash();
         }
 
