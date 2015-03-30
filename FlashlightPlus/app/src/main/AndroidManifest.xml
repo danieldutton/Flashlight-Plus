@@ -17,5 +17,9 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-feature android:name="android.hardware.Camera" android:required="true"/>
+    <uses-feature android:name="android.hardware.Camera.flash" android:required="true"/>
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
 </manifest>
