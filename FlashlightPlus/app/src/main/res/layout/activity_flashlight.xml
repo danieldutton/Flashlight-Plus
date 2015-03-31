@@ -14,4 +14,11 @@
         android:layout_height="wrap_content"
         tools:layout="@layout/fragment_torch" />
 
+    <fragment
+        android:id="@+id/fragmentBatteryStatus"
+        android:name="uk.co.dannybdutton.flashlightplus.fragments.BatteryStatusFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_battery_status"/>
+
 </LinearLayout>
