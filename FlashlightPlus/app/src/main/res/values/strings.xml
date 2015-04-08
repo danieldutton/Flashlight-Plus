@@ -1,5 +1,18 @@
 <resources>
+    <!--Application details-->
     <string name="app_name">Flashlight Plus</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+
+    <!--TorchFragment-->
+    <!--Flash not supported Dialog-->
+    <string name="dialog_flash_error_title">Flash Error</string>
+    <string name="dialog_flash_error_text">Sorry, your device does not appear to support flash hardware</string>
+    <string name="dialog_flash_error_button_text">Ok</string>
+
+    <!--Camera failed to initialise Dialog-->
+    <string name="dialog_camera_error_title">Error</string>
+    <string name="dialog_camera_error_text">Error initialising camera! Please try again</string>
+    <string name="dialog_camera_error_button_text">Ok</string>
+
+    <!--Generic Dialog text-->
+
 </resources>

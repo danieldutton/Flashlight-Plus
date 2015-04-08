@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    tools:ignore="MergeRootFrame">
+    tools:context=".activities.FlashlightActivity"
+    tools:ignore="MergeRootFrame"
+    android:visibility="visible">
 
     <fragment
         android:id="@+id/fragmentTorch"
         android:name="uk.co.dannybdutton.flashlightplus.fragments.TorchFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:layout="@layout/fragment_torch" />
 
     <fragment
@@ -19,6 +20,6 @@
         android:name="uk.co.dannybdutton.flashlightplus.fragments.BatteryStatusFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_battery_status"/>
+        tools:layout="@layout/fragment_battery_status" />
 
 </LinearLayout>

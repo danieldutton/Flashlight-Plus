@@ -3,16 +3,21 @@ package uk.co.dannybdutton.flashlightplus.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.media.MediaPlayer;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
+
+import java.util.List;
 
 import uk.co.dannybdutton.flashlightplus.R;
 
@@ -20,7 +25,7 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
     private Camera camera;
 
-    private Camera.Parameters parameters;
+    private Parameters cameraParameters;
 
     private boolean flashIsOn = false;
 
@@ -33,10 +38,12 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (DeviceHasNoFlash())
-            adviseNoFlashDeviceAvailable();
-
-        getCamera();
+        if (deviceHasNoFlash()){
+            adviseFlashUnavailable();
+        }
+        else{
+            getCamera();
+        }
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,18 +56,18 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    private boolean DeviceHasNoFlash() {
+    private boolean deviceHasNoFlash() {
         return !getActivity().getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
     }
 
-    private void adviseNoFlashDeviceAvailable() {
+    private void adviseFlashUnavailable() {
         AlertDialog alert = new AlertDialog.Builder(getActivity())
                 .create();
 
-        alert.setTitle("Error");
-        alert.setMessage("Sorry, your device doesn't support flash light!");
-        alert.setButton("OK", new DialogInterface.OnClickListener() {
+        alert.setTitle(R.string.dialog_flash_error_title);
+        alert.setMessage(getString(R.string.dialog_flash_error_text));
+        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
                 getActivity().finish();
@@ -96,9 +103,9 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         AlertDialog alert = new AlertDialog.Builder(getActivity())
                 .create();
 
-        alert.setTitle("Error");
-        alert.setMessage("Error initialising camera!");
-        alert.setButton("OK", new DialogInterface.OnClickListener() {
+        alert.setTitle(R.string.dialog_camera_error_title);
+        alert.setMessage(getString(R.string.dialog_camera_error_text));
+        alert.setButton(getString(R.string.dialog_camera_error_button_text), new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
                 getActivity().finish();
@@ -109,32 +116,40 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
     private void turnOnFlash() {
         if (!flashIsOn) {
-            if (camera == null || parameters == null) {
+            if (camera == null || cameraParameters == null) {
                 adviseErrorInitialisingFlash();
                 return;
             }
             playClickSound();
 
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            camera.setParameters(parameters);
-            camera.startPreview();
-            flashIsOn = true;
-        }
+            cameraParameters = camera.getParameters();
 
+            if (flashHasTorchMode()) {
+                cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                camera.setParameters(cameraParameters);
+                camera.startPreview();
+                flashIsOn = true;
+            }
+        }
+    }
+
+    private boolean flashHasTorchMode() {
+        List<String> flashModes = cameraParameters.getSupportedFlashModes();
+
+        return flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH);
     }
 
     private void turnOffFlash() {
         if (flashIsOn) {
-            if (camera == null || parameters == null) {
+            if (camera == null || cameraParameters == null) {
                 adviseErrorInitialisingFlash();
                 return;
             }
             playClickSound();
 
-            parameters = camera.getParameters();
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-            camera.setParameters(parameters);
+            cameraParameters = camera.getParameters();
+            cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(cameraParameters);
             camera.stopPreview();
             flashIsOn = false;
         }
@@ -144,11 +159,30 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         if (camera == null) {
             try {
                 camera = Camera.open();
-                parameters = camera.getParameters();
+                cameraParameters = camera.getParameters();
             } catch (RuntimeException e) {
                 adviseErrorInitialisingFlash();
             }
         }
+    }
+
+    private boolean powerSaverCouldBeActive() {
+
+        final int PowerSaveThreshold = 20;
+
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getActivity().registerReceiver(null, iFilter);
+
+        final int DefaultValue = 0;
+
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DefaultValue);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DefaultValue);
+
+        int batteryPct = Math.round((level / (float) scale) * 100);
+
+        if (batteryPct <= PowerSaveThreshold)
+            return true;
+        else return false;
     }
 
     @Override
@@ -163,6 +197,7 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         super.onPause();
 
         turnOffFlash();
+        //camera should maybe released in here instead of onStop
     }
 
     @Override
@@ -171,9 +206,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
         if (flashIsOn)
             turnOnFlash();
-
-        Toast.makeText(getActivity(), "On Resume", Toast.LENGTH_SHORT)
-                .show();
     }
 
     @Override
@@ -184,16 +216,10 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
             camera.release();
             camera = null;
         }
-        Toast.makeText(getActivity(), "On Stop", Toast.LENGTH_SHORT)
-                .show();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        Toast.makeText(getActivity(), "On Destroy", Toast.LENGTH_SHORT)
-                .show();
     }
-
 }
