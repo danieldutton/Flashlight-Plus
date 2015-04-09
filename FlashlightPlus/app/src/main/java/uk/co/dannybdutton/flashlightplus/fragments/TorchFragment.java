@@ -40,7 +40,12 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
         if (deviceHasNoFlash()){
             adviseFlashUnavailable();
+            return;
         }
+
+        else if(batteryLevelLow())
+            promptTorchMayNotWork();
+
         else{
             getCamera();
         }
@@ -71,6 +76,21 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
             public void onClick(DialogInterface dialog, int which) {
                 getActivity().finish();
+            }
+        });
+        alert.show();
+    }
+
+    private void promptTorchMayNotWork() {
+        AlertDialog alert = new AlertDialog.Builder(getActivity())
+                .create();
+
+        alert.setTitle("Possible Power Saver Mode");
+        alert.setMessage("Battery level low.  If you device power saves the torch may not work");
+        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                return;
             }
         });
         alert.show();
@@ -166,7 +186,7 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private boolean powerSaverCouldBeActive() {
+    private boolean batteryLevelLow() {
 
         final int PowerSaveThreshold = 20;
 

@@ -2,7 +2,6 @@
     android:id="@+id/buttonFlashOn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:src="@drawable/flashlight"
-    android:text="Activate" />
+    android:src="@drawable/flashlight" />
 
 
