@@ -1,70 +1,67 @@
 package uk.co.dannybdutton.flashlightplus.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.widget.Toast;
 
 import uk.co.dannybdutton.flashlightplus.R;
 import uk.co.dannybdutton.flashlightplus.fragments.TorchFragment;
+import uk.co.dannybdutton.flashlightplus.utility.BatteryUtil;
 
 
-public class FlashlightActivity extends FragmentActivity implements TorchSettingsCoordinator {
+public class FlashlightActivity extends FragmentActivity implements StrobeControlCoordinator {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashlight);
-        Toast.makeText(this, "Activity - onCreate", Toast.LENGTH_SHORT)
-                .show();
+
+        if (deviceHasNoFlash()) {
+            adviseFlashUnavailable();
+            return;
+        }
+
+        if (BatteryUtil.batteryPowerIsLow(this)) {
+            promptPossibleInsufficientPower();
+        }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Toast.makeText(this, "Activity - onStart", Toast.LENGTH_SHORT)
-                .show();
+    private boolean deviceHasNoFlash() {
+        return !getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(this, "Activity - onResume", Toast.LENGTH_SHORT)
-                .show();
+    private void adviseFlashUnavailable() {
+        AlertDialog alert = new AlertDialog.Builder(this)
+                .create();
+
+        alert.setTitle(R.string.dialog_flash_error_title);
+        alert.setMessage(getString(R.string.dialog_flash_error_text));
+        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                //finish it here
+            }
+        });
+        alert.show();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Toast.makeText(this, "Activity - onPause", Toast.LENGTH_SHORT)
-                .show();
-    }
+    private void promptPossibleInsufficientPower() {
+        AlertDialog alert = new AlertDialog.Builder(this)
+                .create();
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Toast.makeText(this, "Activity - onStop", Toast.LENGTH_SHORT)
-                .show();
-    }
+        alert.setTitle("Possible Power Saver Mode");
+        alert.setMessage("Battery level low.  If you device power saves the torch may not work");
+        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Toast.makeText(this, "Activity - onRestart", Toast.LENGTH_SHORT)
-                .show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Toast.makeText(this, "Activity - onDestroy", Toast.LENGTH_SHORT)
-                .show();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+        alert.show();
     }
 
     @Override

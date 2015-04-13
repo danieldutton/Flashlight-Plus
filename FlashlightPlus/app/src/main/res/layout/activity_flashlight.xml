@@ -6,22 +6,24 @@
     android:orientation="vertical"
     android:visibility="visible"
     tools:context=".activities.FlashlightActivity"
-    tools:ignore="MergeRootFrame">
+    tools:ignore="MergeRootFrame"
+    android:weightSum="100">
 
     <fragment
         android:id="@+id/fragmentTorch"
         android:name="uk.co.dannybdutton.flashlightplus.fragments.TorchFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         tools:layout="@layout/fragment_torch"
-        android:layout_weight="1" />
+        android:layout_weight="90" />
 
     <fragment
         android:id="@+id/fragmentBatteryStatus"
-        android:name="uk.co.dannybdutton.flashlightplus.fragments.BatteryStatusFragment"
+        android:name="uk.co.dannybdutton.flashlightplus.fragments.StrobeControlFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_battery_status"
+        android:layout_height="0dp"
+        tools:layout="@layout/fragment_strobe_control"
+        android:layout_weight="30"
  />
 
 

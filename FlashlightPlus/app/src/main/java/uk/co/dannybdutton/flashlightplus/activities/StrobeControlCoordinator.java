@@ -1,7 +1,7 @@
 package uk.co.dannybdutton.flashlightplus.activities;
 
 
-public interface TorchSettingsCoordinator {
+public interface StrobeControlCoordinator {
 
     void onSelectedSettingChanged();
 }
