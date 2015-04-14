@@ -1,6 +1,6 @@
 package uk.co.dannybdutton.flashlightplus.fragments;
 
-
+//region imports
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
@@ -16,6 +16,8 @@ import android.widget.ImageButton;
 import java.util.List;
 
 import uk.co.dannybdutton.flashlightplus.R;
+
+//endregion
 
 public class TorchFragment extends Fragment implements View.OnClickListener {
 
@@ -39,15 +41,15 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ImageButton button = (ImageButton) getActivity().findViewById(R.id.buttonFlashOn);
+        button.setOnClickListener(this);
+
         initDeviceCamera();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_torch, container, false);
-
-        ImageButton button = (ImageButton) rootView.findViewById(R.id.buttonFlashOn);
-        button.setOnClickListener(this);
 
         return rootView;
     }
@@ -57,19 +59,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         super.onPause();
 
         turnOffFlash();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (flashIsOn)
-            turnOnFlash();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
 
         if (camera != null) {
             camera.release();
@@ -77,10 +66,19 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        initDeviceCamera();
+        if (flashIsOn)
+            turnOnFlash();
+    }
+
     //endregion
 
     @Override
     public void onClick(View v) {
+
         if (flashIsOn) {
             turnOffFlash();
         } else {
@@ -124,7 +122,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
-
 
 
     private void turnOffFlash() {
