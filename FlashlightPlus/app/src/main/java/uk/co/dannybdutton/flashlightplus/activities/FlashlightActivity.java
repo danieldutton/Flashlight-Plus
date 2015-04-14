@@ -1,67 +1,55 @@
 package uk.co.dannybdutton.flashlightplus.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 import uk.co.dannybdutton.flashlightplus.R;
+import uk.co.dannybdutton.flashlightplus.fdialogs.DialogInfoFragment;
 import uk.co.dannybdutton.flashlightplus.fragments.TorchFragment;
 import uk.co.dannybdutton.flashlightplus.utility.BatteryUtil;
+import uk.co.dannybdutton.flashlightplus.utility.HardwareUtil;
 
 
 public class FlashlightActivity extends FragmentActivity implements StrobeControlCoordinator {
+
+    private final String DialogTag = "InfoDialog";
+
+    private final String DialogMessageKey = "Message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashlight);
 
-        if (deviceHasNoFlash()) {
+        if (HardwareUtil.deviceHasNoFlash(this)) {
             adviseFlashUnavailable();
             return;
         }
 
         if (BatteryUtil.batteryPowerIsLow(this)) {
-            promptPossibleInsufficientPower();
+            advisePhonePowerLow();
         }
     }
 
-    private boolean deviceHasNoFlash() {
-        return !getPackageManager()
-                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-    }
-
     private void adviseFlashUnavailable() {
-        AlertDialog alert = new AlertDialog.Builder(this)
-                .create();
+        DialogInfoFragment infoDialog = new DialogInfoFragment();
 
-        alert.setTitle(R.string.dialog_flash_error_title);
-        alert.setMessage(getString(R.string.dialog_flash_error_text));
-        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
+        Bundle bundle = new Bundle();
+        bundle.putString(DialogMessageKey, getString(R.string.dialog_flash_error_message));
+        infoDialog.setArguments(bundle);
 
-            public void onClick(DialogInterface dialog, int which) {
-                //finish it here
-            }
-        });
-        alert.show();
+        infoDialog.show(getSupportFragmentManager(), DialogTag);
     }
 
-    private void promptPossibleInsufficientPower() {
-        AlertDialog alert = new AlertDialog.Builder(this)
-                .create();
+    private void advisePhonePowerLow() {
+        DialogInfoFragment infoDialog = new DialogInfoFragment();
 
-        alert.setTitle("Possible Power Saver Mode");
-        alert.setMessage("Battery level low.  If you device power saves the torch may not work");
-        alert.setButton(getString(R.string.dialog_flash_error_button_text), new DialogInterface.OnClickListener() {
+        Bundle bundle = new Bundle();
+        bundle.putString(DialogMessageKey, getString(R.string.dialog_powerLow_error_message));
+        infoDialog.setArguments(bundle);
 
-            public void onClick(DialogInterface dialog, int which) {
-                return;
-            }
-        });
-        alert.show();
+        infoDialog.show(getSupportFragmentManager(), DialogTag);
     }
 
     @Override
@@ -70,7 +58,5 @@ public class FlashlightActivity extends FragmentActivity implements StrobeContro
 
         TorchFragment torchFragment = (TorchFragment)
                 fragmentManager.findFragmentById(R.id.fragmentTorch);
-
-        //do work here in torchFragment
     }
 }

@@ -1,27 +1,27 @@
 package uk.co.dannybdutton.flashlightplus.utility;
 
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
 public class BatteryUtil {
 
-    public static boolean batteryPowerIsLow(Activity activity) {
+    public static boolean batteryPowerIsLow(Context context) {
 
-        if (activity == null) throw new NullPointerException("param activity cannot be null");
+        if (context == null) throw new NullPointerException("context cannot be null");
 
         final int PowerSaveThreshold = 20;
 
-        int batteryLevel = getCurrentBatteryChargePercentage(activity);
+        int batteryLevel = getCurrentBatteryChargePercentage(context);
 
         return (batteryLevel <= PowerSaveThreshold) ? true : false;
     }
 
-    public static int getCurrentBatteryChargePercentage(Activity activity) {
+    public static int getCurrentBatteryChargePercentage(Context context) {
         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = activity.registerReceiver(null, iFilter);
+        Intent batteryStatus = context.registerReceiver(null, iFilter);
 
         final int DefaultValue = 0;
 

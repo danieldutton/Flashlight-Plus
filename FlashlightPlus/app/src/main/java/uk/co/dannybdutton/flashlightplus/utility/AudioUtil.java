@@ -4,13 +4,13 @@ package uk.co.dannybdutton.flashlightplus.utility;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import uk.co.dannybdutton.flashlightplus.R;
-
 public class AudioUtil {
 
     private static MediaPlayer mediaPlayer;
 
     public static void playAudio(Context context, int resId) {
+
+        if (context == null) throw new NullPointerException("context cannot be null");
 
         mediaPlayer = MediaPlayer.create(context, resId);
         mediaPlayer.start();

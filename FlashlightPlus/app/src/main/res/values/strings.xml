@@ -2,11 +2,20 @@
     <!--Application details-->
     <string name="app_name">Flashlight Plus</string>
 
-    <!--TorchFragment-->
+    <!--Flashlight Activity-->
+
     <!--Flash not supported Dialog-->
-    <string name="dialog_flash_error_title">Flash Error</string>
-    <string name="dialog_flash_error_text">Sorry, your device does not appear to support flash hardware</string>
-    <string name="dialog_flash_error_button_text">Ok</string>
+    <string name="dialog_flash_error_title">Warning</string>
+    <string name="dialog_flash_error_message">Sorry, your device does not appear to support flash hardware</string>
+
+    <!--Insufficient power Dialog-->
+    <string name="dialog_powerLow_error_title">Warning</string>
+    <string name="dialog_powerLow_error_message">Battery level low.  If you device power saves the torch may not work</string>
+
+    <!--StrobeControlFragment-->
+
+    <!--TorchFragment-->
+
 
     <!--Camera failed to initialise Dialog-->
     <string name="dialog_camera_error_title">Error</string>
@@ -14,5 +23,7 @@
     <string name="dialog_camera_error_button_text">Ok</string>
 
     <!--Generic Dialog text-->
+    <string name="dialog_title_warning">Warning!</string>
+    <string name="dialog_buttonText_ok">Ok</string>
 
 </resources>
