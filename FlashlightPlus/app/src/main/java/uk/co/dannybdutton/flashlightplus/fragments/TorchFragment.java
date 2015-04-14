@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import java.util.List;
 
 import uk.co.dannybdutton.flashlightplus.R;
+import uk.co.dannybdutton.flashlightplus.utility.AudioUtil;
 
 //endregion
 
@@ -28,7 +29,6 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
 
     private boolean flashIsOn = false;
 
-    private MediaPlayer mediaPlayer;
     //endregion
 
     //region Constructor(s)
@@ -41,15 +41,15 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ImageButton button = (ImageButton) getActivity().findViewById(R.id.buttonFlashOn);
-        button.setOnClickListener(this);
-
         initDeviceCamera();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_torch, container, false);
+
+        ImageButton button = (ImageButton) rootView.findViewById(R.id.buttonFlashOn);
+        button.setOnClickListener(this);
 
         return rootView;
     }
@@ -87,12 +87,11 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
     }
 
     private void turnOnFlash() {
-        //encapsulate this duplicate code in a new method
         if (camera == null || cameraParameters == null) {
             adviseErrorInitialisingFlash();
             return;
         }
-        playButtonClickAudio();
+        AudioUtil.playAudio(getActivity(), R.raw.button_click);
 
         cameraParameters = camera.getParameters();
 
@@ -110,27 +109,14 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         return flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH);
     }
 
-
-    //region Methods
-    private void playButtonClickAudio() {
-        mediaPlayer = MediaPlayer.create(getActivity(), R.raw.button_click);
-        mediaPlayer.start();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.release();
-            }
-        });
-    }
-
-
+    //region Method(s)
     private void turnOffFlash() {
         if (flashIsOn) {
             if (camera == null || cameraParameters == null) {
                 adviseErrorInitialisingFlash();
                 return;
             }
-            playButtonClickAudio();
+            AudioUtil.playAudio(getActivity(), R.raw.button_click);
 
             cameraParameters = camera.getParameters();
             cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
@@ -167,5 +153,4 @@ public class TorchFragment extends Fragment implements View.OnClickListener {
         alert.show();
     }
     //endregion
-
 }
